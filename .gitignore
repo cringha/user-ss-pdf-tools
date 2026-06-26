@@ -1,0 +1,5 @@
+# 默认忽略的文件
+/data
+/uv.lock
+/user-list.xlsx
+*.pyc

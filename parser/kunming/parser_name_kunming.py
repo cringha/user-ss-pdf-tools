@@ -1,0 +1,38 @@
+import re
+from typing import List
+
+from parser.common.parser_common import common_social_security_extractor, SocialSecurityUser, AbstractParser
+
+
+def extract_social_security_kunming(pdf_file) -> List[SocialSecurityUser]:
+    """
+    解析福州社保PDF，提取参保人员姓名，过滤无效内容并去重
+    """
+
+    filter_words = {"单位", "个人"}
+
+    # 序号 个人编号 姓名 身份证号 备注
+    # 1 53010214150796 徐章建 53038119940816157X 缴费状态参保缴费
+    #
+    s = r"(\d+)\s+(\d+)\s+([\u4e00-\u9fa5]+)\s+([0-9Xx]{18})\s+(.*?)\s*$"
+    pattern = re.compile(s)
+    output = []
+    items = common_social_security_extractor(pdf_file, pattern, 2)
+    for item in items:
+        num, id_num, name, *_ = item
+        if name in filter_words:
+            print(" name in filter list , ignore ", name)
+        else:
+            print(f"No{num} - User {name}, id:{id_num}")
+            u = SocialSecurityUser(name, id_num)
+            output.append(u)
+
+    return output
+
+
+class KunMingParser(AbstractParser):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def parse_file(self, file_name: str) -> List[SocialSecurityUser]:
+        return extract_social_security_kunming(file_name)
