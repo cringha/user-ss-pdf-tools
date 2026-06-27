@@ -30,6 +30,9 @@ def extract_social_security_dalian(pdf_file):
 class DaLianParser(AbstractParser):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
+    def get_city_names(self) -> List[str]:
+        return ["大连"]
     def parse_file(self, file_name: str) -> List[SocialSecurityUser]:
         return extract_social_security_dalian(file_name)
+    def snapshot_user(self, file_name: str, user_name: str, target_name: str = None):
+        return self.snapshot_user_base(file_name, user_name, target_name, 10, 10, 15,False)

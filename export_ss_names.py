@@ -3,7 +3,7 @@ import argparse
 import pandas as pd
 
 
-from parser.parser_manager import guess_city_key_by_filename, parser_ss_file
+from parser.parser_manager import parser_ss_file_by_file_name
 
 
 def get_last_by_filename_glob(directory, pattern="*"):
@@ -23,20 +23,24 @@ def get_last_by_filename_glob(directory, pattern="*"):
 
 
 def parse_one_file( file: Path , file_type:str ):
-    if file_type is None or file_type == "":
-
-        file_type = guess_city_key_by_filename( file.name)
-
-    if file_type is None or file_type == "":
-        print(f"Can't check file_type by {file.name }")
-        return []
+    # if file_type is None or file_type == "":
+    #
+    #     file_type = parser_ss_file_by_file_name( file.name)
+    #
+    # if file_type is None or file_type == "":
+    #     print(f"Can't check file_type by {file.name }")
+    #     return []
 
     output = []
-    names = parser_ss_file( file_type, str(file) )
-    for name in names:
-        # print(name)
-        one = { "name": name.name , "file_type": file_type , "file" : file.name}
-        output.append(one)
+    try:
+        names = parser_ss_file_by_file_name( file.name, str(file) )
+        for name1 in names:
+            # print(name)
+            one = { "name": name1.name , "file_type": file_type , "file" : file.name}
+            output.append(one)
+    except Exception as e:
+        print(str(e))
+
     return output
 
 

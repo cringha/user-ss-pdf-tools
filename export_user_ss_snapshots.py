@@ -2,8 +2,8 @@ from pathlib import Path
 import argparse
 import pandas as pd
 import os
-from parser.parser_manager import guess_city_key_by_filename, parser_ss_file, get_city_key_by_name, \
-    get_processor_by_city
+
+from parser.parser_manager import get_city_cf_by_name, get_processor_by_city_name
 from uitls.convert_image_to_docx import convert_user_ss_snapshot_images_to_docx
 from uitls.excel_utils import read_excel_sheet_values
 
@@ -21,31 +21,31 @@ def get_last_by_filename_glob(directory, pattern="*"):
     files_sorted = sorted(files, key=lambda f: f.name)
     return files_sorted
 
+#
+# def parse_one_file(file: Path, file_type: str):
+#     if file_type is None or file_type == "":
+#         file_type = guess_city_key_by_filename(file.name)
+#
+#     if file_type is None or file_type == "":
+#         print(f"Can't check file_type by {file.name}")
+#         return []
+#
+#     output = []
+#     names = parser_ss_file(file_type, str(file))
+#     for name in names:
+#         # print(name)
+#         one = {"name": name.name, "file_type": file_type, "file": file.name}
+#         output.append(one)
+#     return output
 
-def parse_one_file(file: Path, file_type: str):
-    if file_type is None or file_type == "":
-        file_type = guess_city_key_by_filename(file.name)
 
-    if file_type is None or file_type == "":
-        print(f"Can't check file_type by {file.name}")
-        return []
-
-    output = []
-    names = parser_ss_file(file_type, str(file))
-    for name in names:
-        # print(name)
-        one = {"name": name.name, "file_type": file_type, "file": file.name}
-        output.append(one)
-    return output
-
-
-def parse_multi_files(files1, file_type: str):
-    output = []
-    for file in files1:
-        one = parse_one_file(file, file_type)
-        if one is not None:
-            output.extend(one)
-    return output
+# def parse_multi_files(files1, file_type: str):
+#     output = []
+#     for file in files1:
+#         one = parse_one_file(file, file_type)
+#         if one is not None:
+#             output.extend(one)
+#     return output
 
 
 def save_names(records, file_name):
@@ -83,8 +83,8 @@ def read_and_process_from_excel(base_pdf_file_dir, output_image_dir,
         user_name = user[col_user_name]
         city = user[col_city_name]
         user_list.append(user_name)
-        city_key = get_city_key_by_name(city)
-        if city_key is None:
+        city_cf = get_city_cf_by_name(city)
+        if city_cf is None:
             print("Can't find city processor ", city, " , user ", user_name)
             continue
 
@@ -99,7 +99,7 @@ def read_and_process_from_excel(base_pdf_file_dir, output_image_dir,
             continue
 
         if city not in city_processor:
-            processor = get_processor_by_city(city, output_dir=output_image_dir)
+            processor = get_processor_by_city_name(city, output_dir=output_image_dir)
             city_processor[city] = processor
 
         processor = city_processor[city]

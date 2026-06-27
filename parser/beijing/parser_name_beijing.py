@@ -35,6 +35,10 @@ class BeijingParser(AbstractParser):
     def __init__(self, **kwargs):
         super().__init__(  **kwargs)
 
+
+    def get_city_names(self) -> List[str]:
+        return ["北京","beijing"]
+
     def parse_file(self, file_name: str) -> List[SocialSecurityUser]:
         return extract_social_security_beijing(file_name)
 

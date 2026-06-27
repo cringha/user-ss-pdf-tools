@@ -4,7 +4,7 @@ from typing import List
 from parser.common.parser_common import common_social_security_extractor, SocialSecurityUser, AbstractParser
 
 
-def extract_social_security_jinan(pdf_file)-> List[SocialSecurityUser]:
+def extract_social_security_jinan(pdf_file) -> List[SocialSecurityUser]:
     """
     解析福州社保PDF，提取参保人员姓名，过滤无效内容并去重
     """
@@ -12,15 +12,15 @@ def extract_social_security_jinan(pdf_file)-> List[SocialSecurityUser]:
     filter_words = {"单位", "个人"}
 
     # 序号 姓名 身份证号码 参保险种 参保起止日期（如有中断分段显示） 备注
-    #1 王宁 130423198804104713 企业养老 202501-202605
+    # 1 王宁 130423198804104713 企业养老 202501-202605
     #
-    s =  r"(\d+)\s+([\u4e00-\u9fa5]+)\s+([0-9Xx]{18})\s+([^\s]+)\s+(\d{6}-\d{6})(.*)"
+    s = r"(\d+)\s+([\u4e00-\u9fa5]+)\s+([0-9Xx]{18})\s+([^\s]+)\s+(\d{6}-\d{6})(.*)"
 
     pattern = re.compile(s)
     output = []
     items = common_social_security_extractor(pdf_file, pattern, 1)
     for item in items:
-        num, name, id_num,  *_ = item
+        num, name, id_num, *_ = item
         if name in filter_words:
             print(" name in filter list , ignore ", name)
         else:
@@ -35,5 +35,11 @@ class JiNanParser(AbstractParser):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+    def get_city_names(self) -> List[str]:
+        return ["济南"]
+
     def parse_file(self, file_name: str) -> List[SocialSecurityUser]:
-        return extract_social_security_jinan( file_name )
+        return extract_social_security_jinan(file_name)
+
+    def snapshot_user(self, file_name: str, user_name: str, target_name: str = None):
+        return self.snapshot_user_base(file_name, user_name, target_name, 10, 10, 5, False)

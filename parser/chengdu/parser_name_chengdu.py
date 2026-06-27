@@ -4,7 +4,7 @@ from typing import List
 from parser.common.parser_common import common_social_security_extractor, SocialSecurityUser, AbstractParser
 
 
-def extract_social_security_chengdu(pdf_file)-> List[SocialSecurityUser]:
+def extract_social_security_chengdu(pdf_file) -> List[SocialSecurityUser]:
     """
     解析福州社保PDF，提取参保人员姓名，过滤无效内容并去重
     """
@@ -35,5 +35,12 @@ class ChengduParser(AbstractParser):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+
+    def get_city_names(self) -> List[str]:
+        return ["成都"]
+
     def parse_file(self, file_name: str) -> List[SocialSecurityUser]:
-        return extract_social_security_chengdu( file_name )
+        return extract_social_security_chengdu(file_name)
+
+    def snapshot_user(self, file_name: str, user_name: str, target_name: str = None):
+        return self.snapshot_user_base(file_name, user_name, target_name, 10, 10, 5)

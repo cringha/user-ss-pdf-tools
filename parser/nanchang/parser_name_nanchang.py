@@ -38,5 +38,8 @@ class NanChangParser(AbstractParser):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+    def get_city_names(self) -> List[str]:
+        return ["南昌"]
+
     def parse_file(self, file_name: str) -> List[SocialSecurityUser]:
         return extract_social_security_nanchang( file_name )

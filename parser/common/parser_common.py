@@ -299,6 +299,9 @@ def snapshot_user_social_security_info_pdf_base(
     return True
 
 
+NAMES = ["北京", "beijing"]
+
+
 class AbstractParser:
     def __init__(self, *args, **kwargs) -> None:
 
@@ -306,6 +309,23 @@ class AbstractParser:
             self.output_dir = kwargs["output_dir"]
         else:
             self.output_dir = "screenshots"
+
+    def get_city_names(self) -> List[str]:
+        pass
+
+    def match_city_name(self, name: str) -> bool:
+        names = self.get_city_names()
+        for loc_name in names:
+            if name in loc_name:
+                return True
+        return False
+
+    def match_file_name(self, file_name: str) -> bool:
+        names = self.get_city_names()
+        for loc_name in names:
+            if loc_name in file_name:
+                return True
+        return False
 
     def parse_file(self, file_name: str) -> List[SocialSecurityUser]:
         pass
@@ -318,7 +338,7 @@ class AbstractParser:
                            left_offset=10,
                            right_offset=10,
                            height_offset=20,
-                           first_and_last_page=True) -> bool:
+                           first_and_last_page=True, cb_process_pre_page=None, cb_gen_file_name=None) -> bool:
 
         full_path = os.path.join(self.output_dir, user_name)
 
@@ -326,13 +346,19 @@ class AbstractParser:
         if not os.path.exists(full_path):
             os.makedirs(full_path)
 
+        loc_gen_file_name = cb_gen_file_name
+
         def gen_file_name(page_num: int) -> str:
             name = f"{user_name}-社保-{page_num:02d}.png"
             return os.path.join(full_path, name)
+
+        if loc_gen_file_name is None:
+            loc_gen_file_name = gen_file_name
 
         if target_name is None:
             target_name = user_name
 
         return snapshot_user_social_security_info_pdf_base(file_name, target_name,
                                                            left_offset, right_offset,
-                                                           height_offset, first_and_last_page, gen_file_name, None)
+                                                           height_offset, first_and_last_page, loc_gen_file_name,
+                                                           cb_process_pre_page)
