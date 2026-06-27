@@ -2,14 +2,12 @@ from pathlib import Path
 import os
 import pandas as pd
 
-
 import fitz  # PyMuPDF，用于PDF处理
 
 BORDER_WIDTH = 4
 
 
 def snapshot(doc, page_num, output_dir, filename):
-
     # 2. 截取首页（第一个包含目标人员的页面）
     first_page = doc[page_num]
     # 将页面转为图片（分辨率300dpi，保证清晰度）
@@ -26,23 +24,27 @@ def snapshot(doc, page_num, output_dir, filename):
 
 
 def process_social_security_pdf_base(
-    pdf_path,
-    target_name,
-    output_dir="screenshots",
-    left_offset=10,
-    right_offset=10,
-    height_offset=20,
-    HT=True,
-    output_prefix="",
-    fn_process=None,
+        pdf_path,
+        target_name,
+        output_dir="screenshots",
+        left_offset=10,
+        right_offset=10,
+        height_offset=20,
+        first_and_last_page=True,
+        output_prefix="",
+        fn_process=None,
 ):
     """
     处理社保PDF文件，定位指定人员并截图（首页/尾页），人员信息加红框
 
     Args:
-        pdf_path (str): PDF文件路径
-        target_name (str): 要定位的人员姓名
-        output_dir (str): 截图保存目录
+        :param first_and_last_page: 是否要截取首页及尾页
+        :param pdf_path:  PDF文件路径
+        :param target_name: 要定位的人员姓名
+        :param height_offset: 狂徒的高度
+        :param right_offset: 画框框的右边的 offset 像素位置，一般是整个页面宽度
+        :param output_dir:  截图保存目录
+        :param left_offset: 画框框的左边的 offset 像素位置
     """
 
     # 打开PDF文件
@@ -104,10 +106,10 @@ def process_social_security_pdf_base(
         if len(target_pages) == 1:
             first_page_num = target_pages[0]
 
-            if HT:
+            if first_and_last_page:
                 snapshot(doc, 0, output_dir, f"{target_name}_{output_prefix}_00")
 
-            if HT:
+            if first_and_last_page:
                 if first_page_num != 0 and first_page_num != total_count - 1:
                     snapshot(
                         doc,
@@ -122,7 +124,7 @@ def process_social_security_pdf_base(
                     output_dir,
                     f"{target_name}_{output_prefix}_{first_page_num:02d}",
                 )
-            if HT:
+            if first_and_last_page:
                 snapshot(
                     doc,
                     total_count - 1,
@@ -130,9 +132,9 @@ def process_social_security_pdf_base(
                     f"{target_name}_{output_prefix}_{total_count - 1:02d}",
                 )
         else:
-            if HT:
+            if first_and_last_page:
                 snapshot(doc, 0, output_dir, f"{target_name}_{output_prefix}_00")
-            if HT:
+            if first_and_last_page:
                 for page_id in target_pages:
                     if page_id != 0 and page_id != total_count - 1:
                         snapshot(
@@ -150,7 +152,7 @@ def process_social_security_pdf_base(
                         f"{target_name}_{output_prefix}_{page_id:02d}",
                     )
 
-            if HT:
+            if first_and_last_page:
                 snapshot(
                     doc,
                     doc.page_count - 1,
@@ -160,19 +162,19 @@ def process_social_security_pdf_base(
 
 
 def process_social_security_pdf_beijing(
-    pdf_path, target_name, output_dir="screenshots"
+        pdf_path, target_name, output_dir="screenshots"
 ):
     process_social_security_pdf_base(pdf_path, target_name, output_dir, 10, 10, 20)
 
 
 def process_social_security_pdf_nanjing(
-    pdf_path, target_name, output_dir="screenshots"
+        pdf_path, target_name, output_dir="screenshots"
 ):
     process_social_security_pdf_base(pdf_path, target_name, output_dir, 10, 10, 5)
 
 
 def process_social_security_pdf_tianjin(
-    pdf_path, target_name, output_dir="screenshots"
+        pdf_path, target_name, output_dir="screenshots"
 ):
     process_social_security_pdf_base(
         pdf_path, target_name, output_dir, 10, 10, 15, False
@@ -180,7 +182,7 @@ def process_social_security_pdf_tianjin(
 
 
 def process_social_security_pdf_chengdu(
-    pdf_path, target_name, output_dir="screenshots"
+        pdf_path, target_name, output_dir="screenshots"
 ):
     process_social_security_pdf_base(pdf_path, target_name, output_dir, 10, 10, 5)
 
@@ -202,7 +204,7 @@ def process_social_security_pdf_fuzhou(pdf_path, target_name, output_dir="screen
 
 
 def process_social_security_pdf_chongqing(
-    pdf_path, target_name, output_dir="screenshots"
+        pdf_path, target_name, output_dir="screenshots"
 ):
     process_social_security_pdf_base(pdf_path, target_name, output_dir, 10, 10, 5)
 
@@ -242,9 +244,8 @@ def guangzhou_process_loc(page):
 
 
 def process_social_security_pdf_guangdong(
-    pdf_path, target_name, output_dir="screenshots"
+        pdf_path, target_name, output_dir="screenshots"
 ):
-
     # 指定目录的Path对象
     directory = Path(pdf_path)
     pattern = "*.pdf"  # 通配符模式
@@ -424,7 +425,6 @@ def trim_all_names(names):
 
 
 def read_excel_sheet_values(file_name, sheet_name):
-
     df = pd.read_excel(file_name, sheet_name)
     out_list = []
 
@@ -453,9 +453,8 @@ CITY_DIRVERS = {
 
 
 def read_and_process_from_excel(
-    file_name, sheet_name, city_sheet_name, base_file_dir, output_dir
+        file_name, sheet_name, city_sheet_name, base_file_dir, output_dir
 ):
-
     city_files = {}
     cities = read_excel_sheet_values(file_name, city_sheet_name)
     for city in cities:

@@ -5,7 +5,7 @@ from parser.changchun.parser_name_changchun import ChangChunParser
 from parser.changsha.parser_name_changsha import ChangShaParser
 from parser.chengdu.parser_name_chengdu import ChengduParser
 from parser.chongqing.parser_name_chongqing import ChongQingParser
-from parser.common.parser_common import SocialSecurityUser
+from parser.common.parser_common import SocialSecurityUser, AbstractParser
 from parser.dalian.parser_name_dalian import DaLianParser
 from parser.fuzhou.parser_name_fuzhou import FuZhouParser
 from parser.guangdong.parser_name_guangdong import GuangDongParser
@@ -65,15 +65,38 @@ def get_city_key_by_name(city_name):
             return key
     return None
 
-def parser_ss_file(city_key: str, pdf_file: str, *args, **kwargs) -> List[SocialSecurityUser]:
 
+def guess_city_key_by_filename( filename :str ):
+    for one in SS_PARSER_FACTORY:
+        key = one["key"]
+        name = one["name"]
+        if name in filename or key.lower() in filename.lower():
+            return key
+    return None
+
+
+def get_processor_by_key( city_key : str,  *args, **kwargs )->AbstractParser | None:
+    if city_key is None:
+        raise ValueError(f"The city {city_key} empty")
     if len(_KEY_PARSERS) == 0:
         _init_key_parsers()
 
     if city_key not in _KEY_PARSERS:
         raise ValueError(f"The city {city_key} does not exist")
+
     factory = _KEY_PARSERS[city_key]
-    inst = factory(args, kwargs)
+    inst = factory(*args,**kwargs)
+    return inst
+
+def get_processor_by_city( city_name : str,  *args, **kwargs ):
+    city_key = get_city_key_by_name(city_name)
+    if city_key is None:
+        return None
+    return get_processor_by_key( city_key , *args, **kwargs )
+
+def parser_ss_file(city_key: str, pdf_file: str, *args, **kwargs) -> List[SocialSecurityUser]:
+    inst = get_processor_by_city( city_key , *args, **kwargs )
+
     return inst.parse_file(pdf_file)
 
 
