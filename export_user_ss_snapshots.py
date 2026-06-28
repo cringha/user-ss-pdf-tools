@@ -21,32 +21,6 @@ def get_last_by_filename_glob(directory, pattern="*"):
     files_sorted = sorted(files, key=lambda f: f.name)
     return files_sorted
 
-#
-# def parse_one_file(file: Path, file_type: str):
-#     if file_type is None or file_type == "":
-#         file_type = guess_city_key_by_filename(file.name)
-#
-#     if file_type is None or file_type == "":
-#         print(f"Can't check file_type by {file.name}")
-#         return []
-#
-#     output = []
-#     names = parser_ss_file(file_type, str(file))
-#     for name in names:
-#         # print(name)
-#         one = {"name": name.name, "file_type": file_type, "file": file.name}
-#         output.append(one)
-#     return output
-
-
-# def parse_multi_files(files1, file_type: str):
-#     output = []
-#     for file in files1:
-#         one = parse_one_file(file, file_type)
-#         if one is not None:
-#             output.extend(one)
-#     return output
-
 
 def save_names(records, file_name):
     df = pd.DataFrame(records)
@@ -131,28 +105,39 @@ def main(args):
                                             args.snapshot_images,
                                             args.input_xlsx,
                                             args.sheet_name_user,
-                                            args.sheet_name_file
+                                            args.sheet_name_file,
+                                            args.col_user_name,
+                                            args.col_city_name,
+                                            args.col_file_name
                                             )
 
     if args.convert:
         convert_user_ss_snapshot_images_to_docx(user_list, args.snapshot_images, args.docx_template_file,
-                                            args.output_docx_file)
+                                                args.output_docx_file)
     return True
 
 
 if __name__ == "__main__":
 
-    #
+    # col_user_name="Name", col_city_name="City", col_file_name="File"
     parser = argparse.ArgumentParser(description="社保PDF转用户截图工具")
     parser.add_argument("-i", "--input-xlsx", help="输入Xlsx文件")
     parser.add_argument("-p", "--pdf-root", help="输入PDF文件根目录")
-    parser.add_argument("-s", "--snapshot-images", help="输出截图文件根目录", default="./output")
-    parser.add_argument("--sheet-name-user", help="User sheet name", default="Users")
-    parser.add_argument("--sheet-name-file", help="File sheet name", default="Files")
+    parser.add_argument("-s", "--snapshot-images", help="输出截图文件根目录; default: %(default)s", default="./output")
+    parser.add_argument("--sheet-name-user", help="User sheet name; default: %(default)s", default="Users")
+    parser.add_argument("--sheet-name-file", help="File sheet name; default: %(default)s", default="Files")
+    parser.add_argument("--col-user-name", help="user column name in `User sheet`; default: %(default)s",
+                        default="Name")
+    parser.add_argument("--col-city-name", help="city column name in `User sheet and File sheet`; default: %(default)s",
+                        default="City")
+    parser.add_argument("--col-file-name", help="file column name in `File sheet`; default: %(default)s",
+                        default="File")
+
     parser.add_argument("-c", "--convert", action="store_true", help="将截图转换为DOCX文档")
-    parser.add_argument("-t", "--docx-template-file", help="docx template filename",
+    parser.add_argument("-t", "--docx-template-file", help="docx template filename; default: %(default)s",
                         default="./data/user_ss_template.docx")
-    parser.add_argument("-o", "--output-docx-file", help="输出docx文件", default="./user-ss-snapshot.docx")
+    parser.add_argument("-o", "--output-docx-file", help="输出docx文件; default: %(default)s",
+                        default="./user-ss-snapshot.docx")
     # parser.add_argument("-h", "--help", help="打印参数信息")
 
     args = parser.parse_args()
