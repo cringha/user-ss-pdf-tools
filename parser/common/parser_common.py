@@ -356,7 +356,7 @@ class AbstractParser:
             loc_gen_file_name = gen_file_name
 
         if target_name is None:
-            target_name = user_name
+            target_name = user_name.rstrip("0123456789")
 
         return snapshot_user_social_security_info_pdf_base(file_name, target_name,
                                                            left_offset, right_offset,
