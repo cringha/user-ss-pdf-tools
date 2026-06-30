@@ -21,14 +21,14 @@ def extract_social_security_changsha(pdf_file) -> List[SocialSecurityUser]:
     items = common_social_security_extractor(pdf_file, pattern, 1)
     num = 0
     for item in items:
-        id_num, name,  *_ = item
+        id_num, name, *_ = item
         if name in filter_words:
             print(" name in filter list , ignore ", name)
         else:
             print(f"No{num} - User {name}, id:{id_num}")
             u = SocialSecurityUser(name, id_num)
             output.append(u)
-        num+= 1
+        num += 1
     return output
 
 
@@ -39,6 +39,9 @@ class ChangShaParser(AbstractParser):
     def get_city_names(self) -> List[str]:
         return ["长沙"]
 
-
     def parse_file(self, file_name: str) -> List[SocialSecurityUser]:
         return extract_social_security_changsha(file_name)
+
+
+    def snapshot_user(self, file_name: str, user_name: str, target_name: str = None ):
+        return self.snapshot_user_base(file_name, user_name, target_name, 10, 10, 20)

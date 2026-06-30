@@ -1,14 +1,9 @@
-import os
 from docx.shared import Mm
 from jinja2 import Environment
-from pathlib import Path
-
 from pathlib import Path
 import os
 import pandas as pd
 
-
-import fitz  # PyMuPDF，用于PDF处理
 
 from docxtpl import DocxTemplate, InlineImage
 

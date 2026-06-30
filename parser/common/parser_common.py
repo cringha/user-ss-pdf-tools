@@ -157,12 +157,13 @@ def snapshot1(doc, page_num, output_dir, filename):
     first_pix.save(os.path.join(output_dir, png_name))
     print(f"截图已保存：{png_name}")
 
+RECT_COLORS = [ (1, 0, 0),(0, 1, 0),(0,0,1)]
 
 def snapshot_user_social_security_info_pdf_base(
         pdf_path,
         user_name,
-        left_offset=10,
-        right_offset=10,
+        page_left_offset=10,
+        page_right_offset=10,
         height_offset=20,
         first_and_last_page=True,
         filename_callback: Callable[[int], str] = None,
@@ -177,8 +178,8 @@ def snapshot_user_social_security_info_pdf_base(
         :param pdf_path:  PDF文件路径
         :param user_name: 要定位的人员姓名
         :param height_offset: 狂徒的高度
-        :param right_offset: 画框框的右边的 offset 像素位置，一般是整个页面宽度
-        :param left_offset: 画框框的左边的 offset 像素位置
+        :param page_right_offset: 画框框的右边的 offset 像素位置，一般是整个页面宽度
+        :param page_left_offset: 画框框的左边的 offset 像素位置
     """
 
     # print("Process ", pdf_path)
@@ -191,7 +192,7 @@ def snapshot_user_social_security_info_pdf_base(
 
     # 存储包含目标人员的页面编号
     target_pages = []
-    rect_list = []  # 存储目标人员位置的矩形框
+    # rect_list = []  # 存储目标人员位置的矩形框
 
     # 1. 遍历PDF页面，查找目标人员并添加红色框
     for page_num in range(doc.page_count):
@@ -208,23 +209,31 @@ def snapshot_user_social_security_info_pdf_base(
         if text_instances:
             target_pages.append(page_num)
             # 给找到的文本添加红色框
-            for rect in text_instances:
+            colors = RECT_COLORS
+            rect_index = 0
+            for rect1 in text_instances:
                 # 调整矩形框大小，让框更美观（上下左右各扩展2个单位）
                 # rect = fitz.Rect(rect.x0-X0_OFFSET, rect.y0-Y0_OFFSET,
                 #                   page_rect.x1+X1_OFFSET, rect.y1+Y1_OFFSET)
-                rect = fitz.Rect(
-                    left_offset,
-                    rect.y0 - height_offset,
-                    page_rect.width - right_offset,
-                    rect.y1 + height_offset,
+                rect_new = fitz.Rect(
+                    page_left_offset,
+                    rect1.y0  - height_offset,
+                    page_rect.width - page_right_offset,
+                    rect1.y1  + height_offset
                 )
-                rect_list.append(rect)
+                # rect_list.append(rect_new)
                 # 添加红色框：width是框线宽度，color是RGB红色
-                annot = page.add_rect_annot(rect)
+                annot = page.add_rect_annot(rect_new)
                 # annot = page.last_annot
-                annot.set_colors(stroke=(1, 0, 0))  # 边框红色
+                color = (1, 0, 0)
+                # if rect_index < len(RECT_COLORS)-1:
+                #     color = RECT_COLORS[rect_index]
+                # else:
+                #     rect_index = 0
+                annot.set_colors(stroke=color)  # 边框红色
                 annot.set_border(width=BORDER_WIDTH)  # 边框宽度2px
                 annot.update()
+                # rect_index+=1
 
     # 检查是否找到目标人员``
     if not target_pages:

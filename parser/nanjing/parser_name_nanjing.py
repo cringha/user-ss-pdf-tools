@@ -45,4 +45,5 @@ class NanJingParser(AbstractParser):
 
 
     def snapshot_user(self, file_name: str, user_name: str, target_name: str = None ):
-        return self.snapshot_user_base(file_name, user_name, target_name, 10, 10, 5)
+        return self.snapshot_user_base(file_name, user_name, target_name,
+                                       10, 10, 5, True)

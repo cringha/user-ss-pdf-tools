@@ -19,7 +19,7 @@ def extract_social_security_hangzhou(pdf_file) -> List[SocialSecurityUser]:
     output = []
     items = common_social_security_extractor(pdf_file, pattern, 1)
     for item in items:
-        num, name, id_num,  *_ = item
+        num, name, id_num, *_ = item
         if name in filter_words:
             print(" name in filter list , ignore ", name)
         else:
@@ -37,6 +37,10 @@ class HangZhouParser(AbstractParser):
     def get_city_names(self) -> List[str]:
         return ["杭州"]
 
-
     def parse_file(self, file_name: str) -> List[SocialSecurityUser]:
         return extract_social_security_hangzhou(file_name)
+
+
+    def snapshot_user(self, file_name: str, user_name: str, target_name: str = None):
+        return self.snapshot_user_base(file_name, user_name, target_name,
+                                       10, 10, 1)
