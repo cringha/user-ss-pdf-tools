@@ -2,7 +2,7 @@
 openpyxl
 PyMuPDF
 pdfplumber
-pip install -i https://pypi.tuna.tsinghua.edu.cn/simple docxtpl jinja2
+pip install -i https://pypi.tuna.tsinghua.edu.cn/simple docxtpl jinja2 pdfplumber PyMuPDF pyinstaller
 
 
 
