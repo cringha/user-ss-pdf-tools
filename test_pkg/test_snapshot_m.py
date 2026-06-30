@@ -52,9 +52,7 @@ if __name__ == "__main__":
     # test_city_xxxx(parent_data_dir, output_image_dir, "成都" ,"陆诗杰" )
     # test_city_xxxx(parent_data_dir, output_image_dir, "成都", "周兴友")
 
-    #    重庆
-    # test_city_xxxx(parent_data_dir, output_image_dir, "重庆" ,"胡凤" )
-    # test_city_xxxx(parent_data_dir, output_image_dir, "重庆", "余夏")
+
 
     #    大连
     # test_city_xxxx(parent_data_dir, output_image_dir, "大连" ,"贾立军" )
@@ -64,8 +62,6 @@ if __name__ == "__main__":
     # test_city_xxxx(parent_data_dir, output_image_dir, "福州", "林益峰")
     # test_city_xxxx(parent_data_dir, output_image_dir, "福州", "吴建耀")
 
-    #    杭州
-    # test_city_xxxx(parent_data_dir, output_image_dir, "杭州", "许巨峰")
 
     #    合肥
     # test_city_xxxx(parent_data_dir, output_image_dir, "合肥", "王泽发")
@@ -83,9 +79,6 @@ if __name__ == "__main__":
     #    南京
     # test_city_xxxx(parent_data_dir, output_image_dir, "南京", "姚斌")
     # test_city_xxxx(parent_data_dir, output_image_dir, "南京", "王方圆")
-    #    南宁
-    # test_city_xxxx(parent_data_dir, output_image_dir, "南宁", "梁良")
-    # test_city_xxxx(parent_data_dir, output_image_dir, "南宁", "张传升")
 
     #    沈阳
     #     test_city_xxxx(parent_data_dir, output_image_dir, "沈阳", "韩易伸")
@@ -101,10 +94,22 @@ if __name__ == "__main__":
     #    乌鲁木齐
     #     test_city_xxxx(parent_data_dir, output_image_dir, "乌鲁木齐", "况文豪")
 
-    #    银川
-    # test_city_xxxx(parent_data_dir, output_image_dir, "银川", "蔡骏潇")
-    # test_city_xxxx(parent_data_dir, output_image_dir, "银川", "计鹏伟")
-    # test_city_xxxx(parent_data_dir, output_image_dir, "银川", "蔡小龙")
 
    #    郑州
-    test_city_xxxx(parent_data_dir, output_image_dir, "郑州", "郑竞可")
+   #  test_city_xxxx(parent_data_dir, output_image_dir, "郑州", "郑竞可")
+
+# ========================================
+
+    #    南宁
+    # test_city_xxxx(parent_data_dir, output_image_dir, "南宁", "梁良")
+    # test_city_xxxx(parent_data_dir, output_image_dir, "南宁", "张传升")
+    #    杭州
+    # test_city_xxxx(parent_data_dir, output_image_dir, "杭州", "许巨峰")
+    #    重庆
+    test_city_xxxx(parent_data_dir, output_image_dir, "重庆" ,"胡凤" )
+    test_city_xxxx(parent_data_dir, output_image_dir, "重庆", "余夏")
+
+    #    银川
+    test_city_xxxx(parent_data_dir, output_image_dir, "银川", "蔡骏潇")
+    test_city_xxxx(parent_data_dir, output_image_dir, "银川", "计鹏伟")
+    test_city_xxxx(parent_data_dir, output_image_dir, "银川", "蔡小龙")

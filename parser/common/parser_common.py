@@ -2,7 +2,8 @@ import re
 from typing import List, Set, Tuple
 
 import pdfplumber
-
+from pymupdf import pymupdf
+from pymupdf import Rect
 
 # 基础配置
 
@@ -134,7 +135,7 @@ from typing import Callable
 import fitz  # PyMuPDF，用于PDF处理
 import os
 
-BORDER_WIDTH = 4
+
 
 
 def snapshot(doc, page_num, filename, user_name, pdf_filename):
@@ -158,6 +159,68 @@ def snapshot1(doc, page_num, output_dir, filename):
     print(f"截图已保存：{png_name}")
 
 RECT_COLORS = [ (1, 0, 0),(0, 1, 0),(0,0,1)]
+
+
+DEFAULT_RECT_COLOR = (1, 0, 0) # red
+DEFAULT_FILL_COLOR = (1, 1, 0) # yellow
+BORDER_WIDTH = 2
+
+def merge_rects_vertical(rects, offset=0.0):
+    """
+    仅依据垂直方向合并矩形。
+    先按 y0 升序排序，然后遍历：
+      - 若当前矩形与上一个合并矩形在垂直方向相交（有重叠的 y 区间），则合并。
+      - 若不相交，但垂直间隙（当前.y0 - 上一个.y1）不大于 offset，也合并。
+      - 否则，当前矩形作为独立项追加。
+    合并后的矩形为所有被合并矩形的最小外接矩形（包含所有 x 范围）。
+
+    :param rects: 原始的 fitz.Rect 列表
+    :param offset: 垂直间隙阈值，若 gap <= offset 则合并（默认 0）
+    :return: 合并后的 fitz.Rect 列表
+    """
+    if not rects:
+        return []
+
+    # 仅按 y0（顶边）排序，不考虑 x0
+    sorted_rects = sorted(rects, key=lambda r: r.y0)
+    merged = []
+
+    for r in sorted_rects:
+        if not merged:
+            merged.append(r)
+            continue
+
+        last = merged[-1]
+
+        # 垂直方向是否相交：当前矩形的顶边 < 上一个矩形的底边 且 当前矩形的底边 > 上一个矩形的顶边
+        vertical_intersect = (r.y0 < last.y1 and r.y1 > last.y0)
+
+        if vertical_intersect:
+            # 垂直相交则合并（取外接矩形）
+            new_rect = fitz.Rect(
+                min(r.x0, last.x0),
+                min(r.y0, last.y0),
+                max(r.x1, last.x1),
+                max(r.y1, last.y1)
+            )
+            merged[-1] = new_rect
+        else:
+            # 不相交，计算垂直间隙
+            gap = r.y0 - last.y1
+            if gap > offset:
+                # 间隙过大，独立
+                merged.append(r)
+            else:
+                # 间隙足够小，合并
+                new_rect = fitz.Rect(
+                    min(r.x0, last.x0),
+                    min(r.y0, last.y0),
+                    max(r.x1, last.x1),
+                    max(r.y1, last.y1)
+                )
+                merged[-1] = new_rect
+
+    return merged
 
 def snapshot_user_social_security_info_pdf_base(
         pdf_path,
@@ -211,7 +274,10 @@ def snapshot_user_social_security_info_pdf_base(
             # 给找到的文本添加红色框
             colors = RECT_COLORS
             rect_index = 0
-            for rect1 in text_instances:
+
+            new_rect_list = merge_rects_vertical( text_instances , 20)
+
+            for rect1 in new_rect_list:
                 # 调整矩形框大小，让框更美观（上下左右各扩展2个单位）
                 # rect = fitz.Rect(rect.x0-X0_OFFSET, rect.y0-Y0_OFFSET,
                 #                   page_rect.x1+X1_OFFSET, rect.y1+Y1_OFFSET)
@@ -225,12 +291,15 @@ def snapshot_user_social_security_info_pdf_base(
                 # 添加红色框：width是框线宽度，color是RGB红色
                 annot = page.add_rect_annot(rect_new)
                 # annot = page.last_annot
-                color = (1, 0, 0)
+                color = DEFAULT_RECT_COLOR
+                fill_color = DEFAULT_FILL_COLOR
                 # if rect_index < len(RECT_COLORS)-1:
                 #     color = RECT_COLORS[rect_index]
                 # else:
                 #     rect_index = 0
-                annot.set_colors(stroke=color)  # 边框红色
+
+                annot.set_colors(stroke=color, fill=fill_color)  # 边框红色
+                annot.set_opacity(opacity=0.2)
                 annot.set_border(width=BORDER_WIDTH)  # 边框宽度2px
                 annot.update()
                 # rect_index+=1
